@@ -1,7 +1,7 @@
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         GameProgress progress1 = new GameProgress(34, 44, 6, 5.5);
         GameProgress progress2 = new GameProgress(55, 35, 2, 9.5);
@@ -20,5 +20,7 @@ public class Main {
         String zipAddressFile = "D:/GamesNetology/savegames/savegames.zip";
 
         GameProgress.zipFiles(zipAddressFile, filesForSave);
+
+        GameProgress.deleteFiles(filesForSave);
     }
 }

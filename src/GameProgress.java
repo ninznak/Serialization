@@ -28,12 +28,26 @@ public class GameProgress implements Serializable {
         }
     }
 
+    public static void deleteFiles(String[] filesToDelete) {
+        for (String filePath : filesToDelete) {
+            File file = new File(filePath);
+            if (file.delete()) {
+                System.out.println("Файл " + filePath + " удален.");
+            } else {
+                System.out.println("Не удалось удалить файл: " + filePath);
+            }
+        }
+    }
+
     static void zipFiles(String zipPath, String[] files) {
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath))) {
-            for (String file : files) {
-                zos.putNextEntry(new ZipEntry(file));
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    ZipOutputStream
+        try (ZipOutputStream zipOutStream = new ZipOutputStream(new FileOutputStream(zipPath))) {
+            for (String filePath : files) {
+                File file = new File(filePath);
+                try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                    ZipEntry zipEntry = new ZipEntry(file.getName());
+                    zipOutStream.putNextEntry(zipEntry);
+                    zipOutStream.write(fileInputStream.readAllBytes());
+                    zipOutStream.closeEntry();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -43,7 +57,7 @@ public class GameProgress implements Serializable {
         }
     }
 
-        @Override
+    @Override
     public String toString() {
         return "GameProgress{" +
                 "health=" + health +
