@@ -37,26 +37,35 @@ public class GameProgress implements Serializable {
                     zipOutStream.putNextEntry(zipEntry);
                     zipOutStream.write(fileInputStream.readAllBytes());
                     zipOutStream.closeEntry();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
                 }
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        deleteFiles(files);
+        for (String filePath : files) {
+            File file = new File(filePath);
+            file.delete();
+        }
     }
 
-    static void openZip(String zipPath, String unzipPath) throws IOException {
+    static void openZip(String zipPath, String unzipPath) {
         File destinationDir = new File(unzipPath);
-        try (ZipInputStream zipInputStream = new ZipInputStream((new FileInputStream(zipPath))) {
 
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipPath));
-            ZipEntry zipEntry = zipInputStream.getNextEntry();
-            zipE
-                zipOutStream.write(zipInputStream.readAllBytes());
+        if (!destinationDir.exists()) {
+            destinationDir.mkdir();
+        }
 
-        } catch(IOException e) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipPath))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                File outputFile = new File(destinationDir, zipEntry.getName());
+                try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+                    fileOutputStream.write(zipInputStream.readAllBytes());
+                    fileOutputStream.flush();
+                }
+                zipInputStream.closeEntry();
+            }
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -69,17 +78,6 @@ public class GameProgress implements Serializable {
             System.out.println(e.getMessage());
         }
         return null;
-    }
-
-    private static void deleteFiles(String[] filesToDelete) {
-        for (String filePath : filesToDelete) {
-            File file = new File(filePath);
-            if (file.delete()) {
-                System.out.println("Файл " + filePath + " удален.");
-            } else {
-                System.out.println("Не удалось удалить файл: " + filePath);
-            }
-        }
     }
 
     @Override
